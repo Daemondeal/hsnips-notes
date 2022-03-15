@@ -78,7 +78,10 @@ snippet template "Template"
 
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-\usepackage[a4paper]{geometry}
+\usepackage[a4paper, left=1cm, top=1cm]{geometry}
+\usepackage{hhline}
+\usepackage{caption}
+\usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{amssymb}
 
