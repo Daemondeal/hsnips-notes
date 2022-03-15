@@ -85,7 +85,7 @@ snippet template "Template"
 \usepackage{amsmath}
 \usepackage{amssymb}
 
-\title{\vspace{-5em}$1}
+\title{$1}
 \author{Daem}
 
 
