@@ -1,0 +1,233 @@
+# Context
+
+global
+function math(context) {
+    return context.scopes.some(s => s.startsWith("meta.math"));
+}
+
+function notMath(context) {
+    return !math(context);
+}
+
+function code(context) { 
+    return context.scopes.some(s => s.startsWith("markup.raw.texttt"));
+}
+endglobal
+
+
+# Quick Snippets
+
+snippet exmpl "Example"
+\textbf{Example:} $0
+endsnippet
+
+snippet esmp "Esempio"
+\textbf{Esempio:} $0
+endsnippet
+
+# Computer Architecture
+
+context code(context)
+snippet $ "Dollar" iA
+\\$
+endsnippet
+
+context code(context)
+snippet `#` "Comment" iA
+\\#
+endsnippet
+
+# Text Decorations
+
+snippet cd "Code" iA
+\texttt{$1}
+endsnippet
+
+snippet itlc "Italic" iA
+\textit{$1}
+endsnippet
+
+snippet bld "Bold" iA
+\textbf{$1}
+endsnippet
+
+# Latex Utils
+
+snippet beg "begin{} / end{}" bA
+\begin{$1}
+$0
+\end{$1}
+endsnippet
+
+snippet sec "Section" bA
+\section{$1}
+$0
+endsnippet
+
+snippet sbsc "Subsection" bA
+\subsection{$1}
+$0
+endsnippet
+
+snippet prg "Paragraph" bA
+\paragraph{$1} $0
+endsnippet
+
+snippet template "Template"
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[a4paper]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{\vspace{-5em}$1}
+\author{Daem}
+
+
+\begin{document}
+\maketitle
+$0
+\end{document}
+endsnippet
+
+# Math
+
+snippet mk "Inline math" wA
+$${1}$``
+if (t[1] && [',', '.', '?', '-', ' '].indexOf(t[1][0]) == -1)
+    rv = ' ';
+else
+    rv = '';
+
+``$2
+endsnippet
+
+snippet dm "Block Math" wA
+\[
+$1
+.\] $0
+endsnippet
+
+context math(context)
+snippet `([A-Za-z])(\d)` "Auto Subscript" wA
+``rv = `${m[1]}_${m[2]}```
+endsnippet
+
+context math(context)
+snippet `([A-Za-z])_(\d\d)` "Auto Subscript" wA
+``rv = `${m[1]}_{${m[2]}```$0}
+endsnippet
+
+context math(context)
+snippet td "Superscript" iA
+^{$1}$0
+endsnippet
+
+context math(context)
+snippet sr "Squared" iA
+^2
+endsnippet
+
+context math(context)
+snippet cb "Cubed" iA
+^3
+endsnippet
+
+context math(context)
+snippet inv "Inverse" iA
+^{-1}
+endsnippet
+
+context math(context)
+snippet vec "Vector" iA
+\vec{$1}$0
+endsnippet
+
+context math(context)
+snippet `\b([a-zA-Z])bar\b` "bar" A
+``rv = '\\bar{' + m[1] + '}'``
+endsnippet
+
+
+
+# Fractions
+
+context math(context)
+snippet // "Fraction simple" A
+\frac{$1}{$2}$0
+endsnippet
+
+context math(context)
+snippet `((\d+)|(\d*)(\\)?([A-Za-z]+)((\^|_)(\{\d+\}|\d))*)/` "Fraction no ()" A
+\frac{``rv = m[1]``}{$1}$0
+endsnippet
+
+context math(context)
+snippet `^.*\)/` "Fraction with ()" A
+``
+    let str = m[0];
+    str = str.slice(0, -1);
+    let lastIndex = str.length - 1;
+
+    let depth = 0;
+    let i = str.length - 1;
+
+    while (true) {
+        if (str[i] == ')') depth += 1;
+        if (str[i] == '(') depth -= 1;
+        if (depth == 0) break;
+        i -= 1;
+    }
+
+    let results = str.slice(0, i) + "\\frac{" + str.slice(i+1, -1) + "}";
+    rv = results;
+    ``{$1}$0
+endsnippet
+
+
+# Table
+
+snippet `table\(([a-zA-Z]+).csv\) ` A
+\begin{table}[htb]
+\centering
+\sffamily
+\captionsetup{font={bf,sf},skip=0.5ex}
+\caption*{$1}
+
+``
+const fs = require('fs');
+
+const csvPath = `${w}/${m[1]}.csv`;
+const csvURL = new URL(csvPath);
+
+
+if (fs.existsSync(csvURL)) {
+    const rawContent = fs.readFileSync(csvURL, { encoding: "utf8" });
+
+    const content = rawContent.split("\n").map(x => x.trim().split(","));
+
+    const maxLength = Math.max(...content.map(x => x.length));
+
+    rv = `\\begin{tabular}{*{${maxLength}}{c}}\n`;
+
+    if (content.length > 2) {
+        rv += "\\toprule\n";
+        rv += content[0].map(x => "\\bfseries " + x).join(" & ") + " \\\\" + "\\\\" + "\n";
+        rv += "\\midrule\n";
+        for (let i = 1; i < content.length; i++)
+            rv += content[i].join(" & ") + " \\\\" + "\\\\" + "\n";
+        rv += "\\bottomrule\n"
+    } else {
+        for (let c of content)
+            rv += c.join(" & ") + " \\\\" + "\\\\" + "\n";
+    }
+} else {
+    rv = `Cannot open file ${csvPath}`;
+} 
+``
+\end{tabular}
+\end{table}
+
+endsnippet
