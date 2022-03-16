@@ -153,7 +153,10 @@ snippet `\b([a-zA-Z])bar\b` "bar" A
 ``rv = '\\bar{' + m[1] + '}'``
 endsnippet
 
-
+context math(context)
+snippet `\b([a-zA-Z])hat\b` "hat" A
+``rv = '\\hat{' + m[1] + '}'``
+endsnippet
 
 # Fractions
 
