@@ -43,7 +43,11 @@ snippet cd "Code" iA
 \texttt{$1}
 endsnippet
 
-snippet itlc "Italic" iA
+snippet uln "Underline" iA
+\underline{$1}
+endsnippet
+
+snippet itc "Italic" iA
 \textit{$1}
 endsnippet
 
